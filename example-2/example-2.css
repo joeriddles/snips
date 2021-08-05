@@ -12,7 +12,7 @@ main {
 
 body {
   margin: 0;
-  padding: 8px;
+  padding: 0 8px;
   box-sizing: border-box;
 }
 
@@ -24,6 +24,7 @@ main {
 .body-container {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   height: 100%;
 }
 
@@ -38,4 +39,15 @@ main {
 .body-container :first-child,
 .body-container :last-child {
   flex: 1;
+}
+
+.content {
+  min-width: 300px;
+  max-width: min(100%, 650px);
+  height: 100%;
+  margin: auto;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
 }
