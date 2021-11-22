@@ -1,0 +1,64 @@
+a {
+    text-decoration: none;
+}
+
+/* catalyst button */
+.catalyst {
+    background-color: #fff;
+    border: 3px solid #333;
+    border-radius: 6px;
+    box-shadow: 0 3px rgba(51,51,51,.2),0 0 0 transparent;
+    color: #333;
+    display: inline-block;
+    letter-spacing: .046875em;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 1em 1.5em;
+    transition: all .15s ease-in-out;
+}
+
+.catalyst:visited {
+    color: #333;
+}
+
+.catalyst:active, .catalyst:hover {
+    background-color: #e0e0e0;
+}
+
+.catalyst:active {
+    box-shadow: none;
+    transform: translateY(2px);
+}
+
+/* .catalyst:focus {
+    box-shadow: 0 3px rgba(51,51,51,.2),0 0 0 3px rgba(183,20,46,.5);
+} */
+
+
+/* jonas button */
+.jonas {
+    background-color: rgb(255, 178, 62);
+    color: rgb(9, 4, 8);
+    display: inline-block;
+    font-family: "Compadre", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    padding: .5em .5em .4em;
+    text-transform: uppercase;
+    transform: skewY(-2deg);
+    transition: all .1s ease-in-out;
+}
+
+.jonas:hover {
+    box-shadow: .2em .2em 0 .05em rgb(9, 4, 8);
+    transform: skewY(-2deg) translateY(-.1em);
+}
+
+.jonas:active {
+    box-shadow: none;
+    transform: skewY(-2deg) translateY(0)
+}
+
+.jonas:visited {
+    color: rgb(9, 4, 8);
+}
