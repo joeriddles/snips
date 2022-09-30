@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- See https://www.duolingo.com/course/el/en/Learn-Greek -->
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Example 6 - Nodes</title>
+  <style>
+    :root {
+      --background-color: #235390;
+
+      --shadow-color: 218deg 60% 20%;
+      --shadow-elevation-low:
+        0px 0.2px 0.2px hsl(var(--shadow-color) / 0.34),
+        0px 0.3px 0.3px -1.2px hsl(var(--shadow-color) / 0.34),
+        0px 0.6px 0.7px -2.5px hsl(var(--shadow-color) / 0.34);
+      --shadow-elevation-medium:
+        0px 0.2px 0.2px hsl(var(--shadow-color) / 0.36),
+        0px 0.5px 0.6px -0.8px hsl(var(--shadow-color) / 0.36),
+        0.1px 1.3px 1.5px -1.7px hsl(var(--shadow-color) / 0.36),
+        0.2px 3.1px 3.5px -2.5px hsl(var(--shadow-color) / 0.36);
+      --shadow-elevation-high:
+        0px 0.2px 0.2px hsl(var(--shadow-color) / 0.34),
+        0.1px 0.9px 1px -0.4px hsl(var(--shadow-color) / 0.34),
+        0.1px 1.7px 1.9px -0.7px hsl(var(--shadow-color) / 0.34),
+        0.2px 2.8px 3.2px -1.1px hsl(var(--shadow-color) / 0.34),
+        0.3px 4.4px 5px -1.4px hsl(var(--shadow-color) / 0.34),
+        0.5px 6.9px 7.8px -1.8px hsl(var(--shadow-color) / 0.34),
+        0.8px 10.6px 12px -2.1px hsl(var(--shadow-color) / 0.34),
+        1.2px 15.5px 17.5px -2.5px hsl(var(--shadow-color) / 0.34);
+    }
+
+    html {
+      background-color: var(--background-color);
+    }
+
+    body {
+      user-select: none;
+      margin: 0;
+      cursor: crosshair;
+    }
+
+    .btn {
+      padding: 8px;
+      border-radius: 1000px;
+
+      border: 0px solid transparent;
+
+      font-size: 1.6rem;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: white;
+
+      -webkit-touch-callout: none;
+      user-select: none;
+      touch-action: manipulation;
+
+      cursor: pointer;
+
+      transition: filter 0.2s;
+    }
+
+    .btn-primary {
+      background: #58cc02;
+      border-bottom: 4px solid transparent;
+      box-shadow:
+        0 4px 0 #58a700,
+        var(--shadow-elevation-medium);
+      padding-bottom: 6px;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-primary:active {
+      box-shadow: none;
+      transform: translateY(4px);
+    }
+
+    .circle-btn {
+      padding: 4px 12px;
+    }
+  </style>
+  <style>
+    .canvas-container {
+      position: relative;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    .canvas-container canvas {
+      z-index: -1;
+      background-color: white;
+    }
+
+    .canvas-container button {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+    }
+  </style>
+</head>
+
+<body ontouchstart="">
+  <div class="canvas-container">
+    <canvas></canvas>
+    <button id="initialNode" class="btn btn-primary circle-btn" onclick="startDrawing(event);">+</button>
+  </div>
+
+  <script>
+    const canvasContainer = document.querySelector(".canvas-container")
+    const canvas = document.querySelector("canvas")
+
+    canvas.height = canvasContainer.offsetHeight
+    canvas.width = canvasContainer.offsetWidth
+
+    const context = canvas.getContext("2d")
+
+    let x, y
+    let pendingLine
+
+    const lines = []
+    const circles = []
+
+    function drawLine(x1, y1, x2, y2, color="#58a700") {
+      context.beginPath();
+      context.moveTo(x1, y1);
+      context.lineTo(x2, y2);
+      context.lineWidth = 4
+      context.strokeStyle = color
+      context.stroke(); 
+    }
+
+    function drawCircle(x, y) {
+      context.beginPath()
+      context.lineWidth = 4
+      context.fillStyle = "#58a700"
+      context.arc(x, y, 43.5 / 2 - 4, 0, 2 * Math.PI);
+      context.fill()
+    }
+
+    function clear() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function build() {
+      lines.forEach(line => {
+        drawLine(line[0], line[1], line[2], line[3])
+      })
+      circles.forEach(([x, y]) => {
+        drawCircle(x, y)
+      })
+    }
+
+    function redraw() {
+      clear()
+      build()
+    }
+
+    function onDrawingMove(event) {
+      redraw()
+      if (x && y) {
+        const bounds = event.target.getBoundingClientRect();
+        const xCoord = event.clientX - bounds.left
+        const yCoord = event.clientY - bounds.top
+        drawLine(x, y, xCoord, yCoord, "#58cc02")
+      }
+    }
+
+    function onDrawingClick(event) {
+      addNode(event)
+      removeDrawingListeners()
+    }
+
+    function addDrawingListeners() {
+      canvas.addEventListener("mousemove", onDrawingMove)
+      canvas.addEventListener("touchmove", onDrawingMove)
+      canvas.addEventListener("touchstart", onDrawingMove)
+
+      canvas.addEventListener("click", onDrawingClick)
+      canvas.addEventListener("touchend", onDrawingClick)
+    }
+
+    function removeDrawingListeners() {
+      canvas.removeEventListener("mousemove", onDrawingMove)
+      canvas.removeEventListener("touchmove", onDrawingMove)
+      canvas.removeEventListener("touchstart", onDrawingMove)
+
+      canvas.removeEventListener("click", onDrawingClick)
+      canvas.removeEventListener("touchend", onDrawingClick)
+    }
+
+    function startDrawing(event) {
+      console.log(event)
+      x = event.target.offsetLeft + (event.target.offsetWidth / 2)
+      y = event.target.offsetTop + (event.target.offsetHeight / 2)
+      addDrawingListeners()
+    }
+
+    function createButton() {
+      const div = document.createElement("div");
+      div.innerHTML = '<button class="btn btn-primary circle-btn" onclick="startDrawing(event);">+</button>';
+      return div.firstChild;
+    }
+
+    function addNode(event) {
+      if (x && y) {
+        const button = createButton()
+        canvasContainer.appendChild(button)
+
+        let xCoord, yCoord
+        if (window.TouchEvent && event instanceof TouchEvent) {
+          const touch = event.changedTouches[0]
+          xCoord = touch.clientX
+          yCoord = touch.clientY
+        } else {
+          xCoord = event.clientX
+          yCoord = event.clientY
+        }
+        const bounds = event.target.getBoundingClientRect()
+        xCoord -= bounds.left
+        yCoord -= bounds.top
+
+        const left = xCoord - (button.offsetWidth / 2)
+        const top = yCoord - (button.offsetHeight / 2)
+        button.style.left = `${left}px`
+        button.style.top = `${top}px`
+
+        redraw()
+
+        drawLine(x, y, xCoord, yCoord)
+        lines.push([x, y, xCoord, yCoord])
+
+        drawCircle(xCoord, yCoord)
+        circles.push([xCoord, yCoord])
+
+        x, y = null, null
+      }
+
+    }
+
+    function moveInitialNode(event) {
+      let xCoord, yCoord
+      if (window.TouchEvent && event instanceof TouchEvent) {
+        const touch = event.changedTouches[0]
+        xCoord = touch.clientX
+        yCoord = touch.clientY
+      } else {
+        xCoord = event.clientX
+        yCoord = event.clientY
+      }
+      const bounds = event.target.getBoundingClientRect()
+      xCoord -= bounds.left
+      yCoord -= bounds.top
+
+      xCoord -= initialNode.offsetWidth / 2
+      yCoord -= initialNode.offsetHeight / 2
+
+      initialNode.style.left = xCoord + "px"
+      initialNode.style.top = yCoord + "px"
+    }
+
+    function placeInitialNode() {
+      const bounds = initialNode.getBoundingClientRect();
+      const initalX = initialNode.offsetLeft  + (initialNode.offsetWidth / 2)
+      const initalY = initialNode.offsetTop + (initialNode.offsetHeight / 2) 
+      drawCircle(initalX, initalY)
+      circles.push([initalX, initalY])
+
+      canvas.removeEventListener("click", moveInitialNode)
+      canvas.removeEventListener("touchend", moveInitialNode)
+      initialNode.removeEventListener("click", placeInitialNode)
+      initialNode.removeEventListener("touchend", placeInitialNode)
+
+      document.querySelector("body").style.cursor = "auto"
+    }
+
+    canvas.addEventListener("click", moveInitialNode)
+    canvas.addEventListener("touchend", moveInitialNode)
+    
+    const initialNode = document.getElementById("initialNode")
+    initialNode.addEventListener("click", placeInitialNode)
+    initialNode.addEventListener("touchend", placeInitialNode)
+  </script>
+</body>
+
+</html>

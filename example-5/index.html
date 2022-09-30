@@ -5,7 +5,6 @@
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="../styles.css" />
         <title>Example 5 - 3D button</title>
         <style>
             :root {
@@ -34,6 +33,10 @@
 
             html {
                 background-color: var(--background-color);
+            }
+
+            body {
+                user-select: none;
             }
 
             .btn {
@@ -110,6 +113,7 @@
 
             .canvas-container canvas {
                 z-index: -1;
+                max-width: 100%;
             }
 
             .canvas-container button {
@@ -164,10 +168,13 @@
                 build()
             }
 
-            function onDrawingMouseMove(event) {
+            function onDrawingMove(event) {
                 redraw()
                 if (x && y) {
-                    rc.line(x, y, event.layerX, event.layerY, {
+                    const bounds = event.target.getBoundingClientRect();
+                    const xCoord = event.clientX - bounds.left
+                    const yCoord = event.clientY - bounds.top
+                    rc.line(x, y, xCoord, yCoord, {
                         stroke: "#58cc02",
                         strokeWidth: 3,
                         strokeLineDash: [5, 8],
@@ -175,20 +182,34 @@
                 }
             }
 
-            function addDrawingListener() {
-                canvas.addEventListener("mousemove", onDrawingMouseMove)
+            function onDrawingClick(event) {
+                addNode(event)
+                removeDrawingListeners()
             }
 
-            function removeDrawingListener() {
-                canvas.removeEventListener("mousemove", onDrawingMouseMove)
+            function addDrawingListeners() {
+                canvas.addEventListener("mousemove", onDrawingMove)
+                canvas.addEventListener("touchmove", onDrawingMove)
+                canvas.addEventListener("touchstart", onDrawingMove)
+                
+                canvas.addEventListener("click", onDrawingClick)
+                canvas.addEventListener("touchend", onDrawingClick)
+            }
+
+            function removeDrawingListeners() {
+                canvas.removeEventListener("mousemove", onDrawingMove)
+                canvas.removeEventListener("touchmove", onDrawingMove)
+                canvas.removeEventListener("touchstart", onDrawingMove)
+
+                canvas.removeEventListener("click", onDrawingClick)
+                canvas.removeEventListener("touchend", onDrawingClick)
             }
 
             function startDrawing(event) {
-                // middle of event target
+                console.log(event)
                 x = event.target.offsetLeft + (event.target.offsetWidth / 2)
                 y = event.target.offsetTop + (event.target.offsetHeight / 2)
-                console.log(x, y)
-                addDrawingListener()
+                addDrawingListeners()
             }
 
             function createButton() {
@@ -199,30 +220,38 @@
 
             function addNode(event) {
                 if (x && y) {
+                    const button = createButton()
+                    canvasContainer.appendChild(button)
+
+                    let xCoord, yCoord
+                    if (window.TouchEvent && event instanceof TouchEvent) {
+                        const touch = event.changedTouches[0]
+                        console.log(touch)
+                        xCoord = touch.clientX + touch.radiusX
+                        yCoord = touch.clientY + touch.radiusY
+                    } else {
+                        xCoord = event.clientX
+                        yCoord = event.clientY
+                    }
+                    const bounds = event.target.getBoundingClientRect()
+                    xCoord -= bounds.left
+                    yCoord -= bounds.top
+
+                    const left = xCoord - (button.offsetWidth / 2)
+                    const top = yCoord - (button.offsetHeight / 2)
+                    button.style.left = `${left}px`
+                    button.style.top = `${top}px`
+
                     redraw()
-                    
-                    rc.line(x, y, event.layerX, event.layerY, {
+                    rc.line(x, y, xCoord, yCoord, {
                         stroke: "#58a700",
                         strokeWidth: 3,
                     })
-                    lines.push([x, y, event.layerX, event.layerY])
+                    lines.push([x, y, xCoord, yCoord])
 
-                    const button = createButton()
-                    canvasContainer.appendChild(button)
-                    const left = event.layerX - (button.offsetWidth / 2)
-                    const top = event.layerY - (button.offsetHeight / 2)
-                    button.style.left = `${left}px`
-                    button.style.top = `${top}px`
-                    
                     x, y = null, null
                 }
             }
-
-            canvas.addEventListener("click", (event) => {
-                addNode(event)
-                removeDrawingListener()
-            })
-
         </script>
     </body>
 </html>
