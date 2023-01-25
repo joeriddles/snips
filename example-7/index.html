@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In-Progress Checkbox</title>
+    <style>
+        input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+
+            border: 1px solid gray;
+            border-radius: 4px;
+            width: 16px;
+            height: 16px;
+        }
+
+        input[type="checkbox"]:hover {
+            background-color: lightskyblue;
+        }
+
+        input[type="checkbox"]:checked {
+            background-color: blue;
+        }
+
+        input[type="checkbox"]:checked:hover {
+            background-color: darkblue;
+        }
+
+        input[type="checkbox"]:indeterminate {
+            background-color: red;
+            clip-path: polygon(100% 0, 100% 10%, 10% 100%, 0 100%, 0 0);
+        }
+
+        input[type="checkbox"]:indeterminate:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+    <input type="checkbox" data-state="checked" />
+    <input type="checkbox" data-state="indeterminate" />
+    <input type="checkbox" data-state="unchecked" />
+    <script>
+        document.querySelectorAll("input[indeterminate='true']").forEach(element => {
+            element.indeterminate = true
+        })
+
+        document.querySelectorAll("input[type='checkbox']").forEach(element => {
+            setCheckboxAttrs(element)
+            element.onclick = (event) => onCheckboxClick(event.originalTarget)
+        })
+
+        function onCheckboxClick(input) {
+            if (input.dataset.state === "unchecked") {
+                input.dataset.state = "indeterminate"
+            } else if (input.dataset.state == "indeterminate") {
+                input.dataset.state = "checked"
+            } else if (input.dataset.state == "checked") {
+                input.dataset.state = "unchecked"
+            }
+            setCheckboxAttrs(input)
+        }
+
+        function setCheckboxAttrs(input) {
+            if (input.dataset.state === "unchecked") {
+                input.checked = false
+                input.indeterminate = false
+            } else if (input.dataset.state == "indeterminate") {
+                input.checked = false
+                input.indeterminate = true
+            } else if (input.dataset.state == "checked") {
+                input.checked = true
+                input.indeterminate = false
+            }
+        }
+    </script>
+</body>
+</html>
